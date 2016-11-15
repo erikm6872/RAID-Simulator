@@ -8,10 +8,10 @@
 class Disk:
     def __init__(self, disk_id):
         self.disk_id = disk_id
-        self.data = ""
+        self.data = []
 
     def __repr__(self):
-        return repr(self.disk_id) + ":" + self.data
+        return repr(self.disk_id) + ":" + repr(self.data)
 
     def write(self, data):
-        self.data += data
+        self.data.append(data)
