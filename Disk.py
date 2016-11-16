@@ -1,7 +1,7 @@
 # CSCI 460 Final Project
 # RAID-5 Simulator
 #   Disk.py
-# Erik McLaughlin & Tyler Wright
+# Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
 
 
