@@ -16,6 +16,7 @@ class RAIDController:
     disks = []
 
     def __init__(self, num_disks):
+        self.num_disks = num_disks
         for i in range(num_disks):
             self.disks.append(Disk(i))
 
@@ -37,7 +38,7 @@ class RAIDController:
             parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
 
             # Write block to disks
-            for i in range(len(self.disks)):
+            for i in range(len(x)):
                 self.disks[i].write(x[i])
 
     # Simulate a disk failing by removing it from the list

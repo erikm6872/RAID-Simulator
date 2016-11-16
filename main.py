@@ -3,23 +3,24 @@
 #
 # Erik McLaughlin & Tyler Wright
 # 11/14/2016
+
 from RAIDController import *
 
-
-# "Hello World" in binary
-data = "011010000110010101101100011011000110111100100000011101110110111101110010011011000110010000001010"
+data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'#Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 
 
 def main():
     controller = RAIDController(5)
-    controller.write_string(convert_string(data))
+    d = ''.join(format(ord(x), 'b') for x in data)[2:]
+    controller.write_string(convert_string(d))
     controller.print_data()
 
 
 def convert_string(d):
-    bin_str = []
+    bin_list = []
     for x in d:
-        bin_str.append(int(x))
-    return bin_str
+        bin_list.append(int(x))
+    return bin_list
+
 
 main()
