@@ -26,13 +26,14 @@ class RAIDController:
         parity_disk = len(self.disks) - 1   # Starts at the last disk and moves backwards
 
         for x in blocks:
-            # Calculate parity bit for block x
+            # Calculate parity bit for block x. We need to convert the bin strings to integers in order to use bit
+            # manipulation to calculate the XOR
             parity_bit = None
             for b in x:
-                parity_bit = parity_bit ^ b if parity_bit is not None else b
+                parity_bit = parity_bit ^ int(b, 2) if parity_bit is not None else int(b, 2)
 
             # Insert the parity bit into the block at the position of the current parity disk
-            x.insert(parity_disk, parity_bit)
+            x.insert(parity_disk, bin(parity_bit))
 
             # Calculate the new parity disk
             parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
@@ -47,9 +48,10 @@ class RAIDController:
         parity_disk = len(self.disks) - 1  # Starts at the last disk and moves backwards
         for i in range(len(self.disks[0])):
             for j in range(self.num_disks):
+
                 if j != parity_disk and i < len(self.disks[j]):
-                    # Add bit to return string
-                    ret_str += str(self.disks[j].read(i))
+                    ret_str += chr(int(self.disks[j].read(i), 2))   # Convert bin string to integer, then to character
+
             # Update parity disk index
             parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
         return ret_str
