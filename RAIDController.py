@@ -58,22 +58,24 @@ class RAIDController:
     def disk_fails(self, disk_num):
         print("Disk " + repr(disk_num) + " failed")
         del self.disks[disk_num]
-        self.num_disks -= 1
 
+    # Prints the data on each disk in a table. Parity bits are marked with '*'
     def print_data(self):
         for x in self.disks:
             print(" |  " + repr(x.disk_id), end="")
         print(" |")
         print(" --------------------------")
 
+        parity_disk = len(self.disks) - 1  # Starts at the last disk and moves backwards
         for i in range(len(self.disks[0])):
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
                     print(" | " + repr(self.disks[j].read(i)), end="")
-                    if j == (i % (self.num_disks)):
+                    if j == parity_disk:
                         print("*", end="")
                     else:
                         print(" ", end="")
+            parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
             print(" |")
 
 
