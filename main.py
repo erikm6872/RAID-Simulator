@@ -31,8 +31,4 @@ def convert_string(d):
         bin_list.append(int(x))
     return bin_list
 
-
-
-
-
 main()

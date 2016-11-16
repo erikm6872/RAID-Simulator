@@ -62,4 +62,19 @@ class RAIDController:
 
     def print_data(self):
         for x in self.disks:
-            print(x)
+            print(" |  " + repr(x.disk_id), end="")
+        print(" |")
+        print(" --------------------------")
+
+        for i in range(len(self.disks[0])):
+            for j in range(len(self.disks)):
+                if i < len(self.disks[j]):
+                    print(" | " + repr(self.disks[j].read(i)), end="")
+                    if j == (i % (self.num_disks)):
+                        print("*", end="")
+                    else:
+                        print(" ", end="")
+            print(" |")
+
+
+
