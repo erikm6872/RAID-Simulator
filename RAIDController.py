@@ -34,10 +34,7 @@ class RAIDController:
             x.insert(parity_disk, parity_bit)
 
             # Calculate the new parity disk
-            if parity_disk == 0:
-                parity_disk = len(self.disks) - 1
-            else:
-                parity_disk -= 1
+            parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
 
             # Write block to disks
             for i in range(len(self.disks)):
