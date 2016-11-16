@@ -15,12 +15,24 @@ def main():
     controller.write_string(convert_string(d))
     controller.print_data()
 
+    # controller.disk_fails(1)
+    # controller.print_data()
+
+    print("Original: " + d)
+    print("Read:     " + controller.read_all())
+
+    if d != controller.read_all():
+        print("R/W Error: Strings are different")
+
 
 def convert_string(d):
     bin_list = []
     for x in d:
         bin_list.append(int(x))
     return bin_list
+
+
+
 
 
 main()

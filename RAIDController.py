@@ -41,9 +41,24 @@ class RAIDController:
             for i in range(len(x)):
                 self.disks[i].write(x[i])
 
+    # Read all data on disks, ignoring parity bits. Does not account for missing disks.
+    def read_all(self):
+        ret_str = ''
+        parity_disk = len(self.disks) - 1  # Starts at the last disk and moves backwards
+        for i in range(len(self.disks[0])):
+            for j in range(self.num_disks):
+                if j != parity_disk and i < len(self.disks[j]):
+                    # Add bit to return string
+                    ret_str += str(self.disks[j].read(i))
+            # Update parity disk index
+            parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
+        return ret_str
+
     # Simulate a disk failing by removing it from the list
     def disk_fails(self, disk_num):
+        print("Disk " + repr(disk_num) + " failed")
         del self.disks[disk_num]
+        self.num_disks -= 1
 
     def print_data(self):
         for x in self.disks:

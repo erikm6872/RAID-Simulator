@@ -13,5 +13,11 @@ class Disk:
     def __repr__(self):
         return repr(self.disk_id) + ":" + repr(self.data)
 
+    def __len__(self):
+        return len(self.data)
+
     def write(self, data):
         self.data.append(data)
+
+    def read(self, index):
+        return self.data[index]
