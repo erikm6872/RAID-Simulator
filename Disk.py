@@ -6,9 +6,10 @@
 
 
 class Disk:
-    def __init__(self, disk_id):
+    def __init__(self, disk_id, capacity=0):
         self.disk_id = disk_id
         self.data = []
+        self.capacity = capacity
 
     def __repr__(self):
         return repr(self.disk_id) + ":" + repr(self.data)
