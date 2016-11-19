@@ -36,12 +36,11 @@ def main():
         except DiskReconstructException as e:
             print(e.msg)
 
-    all_data = ""
-    for x in data:
-        all_data += x
-
-    if all_data != controller.read_all():
-        raise DataMismatchException("Original and read strings are different.\nOriginal: " + all_data + "\nRead:     " + controller.read_all())
+    print(controller.read_all_data())
+    read_files = controller.read_all_files()
+    if files != read_files:
+        raise DataMismatchException(
+            "Original and read strings are different.\nOriginal: " + repr(files) + "\nRead:     " + repr(read_files))
 
 
 main()

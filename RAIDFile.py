@@ -19,7 +19,15 @@ class RAIDFile:
         return len(self.data_B)
 
     def __repr__(self):
-        return "'" + self.data_S + "'"
+        return repr(self.id) + ": '" + self.data_S + "'"
+
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.data_B == other.data_B
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     @staticmethod
     def convert_string(d):
