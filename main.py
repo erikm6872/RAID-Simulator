@@ -5,7 +5,7 @@
 # 11/14/2016
 
 from RAIDController import *
-from RAID_File import *
+from RAIDFile import *
 from RAIDExceptions import *
 
 data = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',

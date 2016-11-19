@@ -5,7 +5,7 @@
 # 11/14/2016
 from Disk import Disk
 from RAIDExceptions import *
-from RAID_File import *
+from RAIDFile import *
 
 def split_data(data, size):
     for i in range(0, len(data), size):
