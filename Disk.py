@@ -16,6 +16,14 @@ class Disk:
     def __len__(self):
         return len(self.data)
 
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def write(self, data):
         self.data.append(data)
 
