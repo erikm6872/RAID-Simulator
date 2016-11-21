@@ -20,8 +20,8 @@ class ParityCalculationException(Exception):
             msg = "Incorrect parity bit calculation\nBlock: "
             for x in block:
                 msg += x + " "
-            msg += "\nExpected: " + repr(expected) + " (" + format(expected, '#010b') + ")\n"
-            msg += "Actual:   " + repr(actual) + " (" + format(actual, '#010b') + ")\n"
+            msg += "\nExpected: " + repr(expected) + " (" + format(expected, bin_format) + ")\n"
+            msg += "Actual:   " + repr(actual) + " (" + format(actual, bin_format) + ")\n"
         super(ParityCalculationException, self).__init__(msg)
 
 
@@ -58,12 +58,12 @@ class RAIDController:
             # manipulation to calculate the XOR
 
             parity_bit = self.calculate_parity(x)
-            self.validate_parity(x + [format(parity_bit, '#010b')])
+            self.validate_parity(x + [format(parity_bit, bin_format)])
 
             parity_disk = self.calculate_parity_disk(len(self))
 
             # Insert the parity bit into the block at the position of the current parity disk
-            x.insert(parity_disk, format(parity_bit, '#010b'))
+            x.insert(parity_disk, format(parity_bit, bin_format))
 
             # Write block to disks
             for i in range(len(x)):
@@ -79,7 +79,7 @@ class RAIDController:
         self.files.append(file)
         blocks = list(split_data(file.data_B, len(self.disks) - 1))
         file.padding = (len(self.disks) - 1) - len(blocks[-1])
-        self.__write_bits(file.data_B + [format(0, '#010b')] * file.padding)
+        self.__write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
     # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):
@@ -130,9 +130,9 @@ class RAIDController:
             block = []
             for j in range(len(self.disks)):
                 block.append(self.disks[j].read(i))
-            self.validate_parity(block + [format(self.calculate_parity(block), '#010b')])
+            self.validate_parity(block + [format(self.calculate_parity(block), bin_format)])
 
-            new_disk.write(format(self.calculate_parity(block), '#010b'))
+            new_disk.write(format(self.calculate_parity(block), bin_format))
         self.disks.insert(disk_num, new_disk)
         self.validate_disks()
 

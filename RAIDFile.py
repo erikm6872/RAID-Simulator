@@ -4,6 +4,8 @@
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
 
+bin_format = '#010b'    # Binary format to store data. '#010b' = 10 bits including '0b' append
+
 
 class RAIDFile:
     data_B = []
@@ -33,7 +35,7 @@ class RAIDFile:
     def convert_string(d):
         bin_list = []
         for x in d:
-            bin_list.append(format(ord(x), '#010b'))  # Change character -> integer -> binary string and append to list
+            bin_list.append(format(ord(x), bin_format))  # Change character -> integer -> binary string and append to list
         return bin_list
 
     @staticmethod
