@@ -7,6 +7,7 @@ from Disk import Disk
 from RAIDExceptions import *
 from RAIDFile import *
 
+
 class ParityCalculationException(Exception):
     def __init__(self, block=None, expected=None, actual=None):
         self.block = block
