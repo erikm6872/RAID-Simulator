@@ -3,14 +3,33 @@
 #
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
-
+from argparse import *
 from RAIDController import *
-
-data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'# Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 
 
 def main():
-    controller = RAIDController(4)
+    parser = ArgumentParser(description='RAID-5 Simulator')
+    parser.add_argument('-n', '--numdisks',
+                        type=int,
+                        default=4,
+                        metavar='DISKS',
+                        help='Number of disks in the RAID array. Default=4')
+
+    parser.add_argument('-d', '--data',
+                        type=str,
+                        default='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+                                ' incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud '
+                                'exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+                        help='Data string to write to the disks array. Default is a Lorem Ipsum string.')
+
+    args = parser.parse_args()
+    num_disks = args.numdisks
+    data = args.data
+
+    if num_disks < 3:
+        parser.error("RAID-5 requires a minimum of 3 disks.")
+
+    controller = RAIDController(num_disks)
     controller.write_string(convert_string(data))
     controller.print_data()
 
