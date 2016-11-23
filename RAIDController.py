@@ -41,10 +41,11 @@ class RAIDController:
     disks = []
     files = []
 
-    def __init__(self, num_disks):
+    def __init__(self, num_disks, disk_cap=0):
         self.num_disks = num_disks
+        self.disk_cap = disk_cap
         for i in range(num_disks):
-            self.disks.append(Disk(i))
+            self.disks.append(Disk(i, disk_cap))
 
     def __len__(self):
         return len(self.disks[0])
@@ -125,7 +126,7 @@ class RAIDController:
         if (self.num_disks - len(self.disks)) > 1:
             raise DiskReconstructException("Cannot reconstruct disk: too many disks missing")
 
-        new_disk = Disk(disk_num)
+        new_disk = Disk(disk_num, self.disk_cap)
         for i in range(len(self.disks[0])):
             block = []
             for j in range(len(self.disks)):

@@ -3,6 +3,7 @@
 #
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
+import sys
 from argparse import *
 from RAIDController import *
 from RAIDFile import *
@@ -18,6 +19,12 @@ def main():
                         default=5,
                         metavar='DISKS',
                         help='Number of disks in the RAID array. Default=5')
+
+    parser.add_argument('-c', '--capacity',
+                        type=int,
+                        default=0,
+                        metavar='CAP',
+                        help='Storage capacity of each disk in bytes. Default=0 (unlimited)')
 
     parser.add_argument('-f', '--fail',
                         type=int,
@@ -48,19 +55,26 @@ def main():
 
     args = parser.parse_args()
     num_disks = args.numdisks
+    disk_cap = args.capacity
     data = args.data
 
     if num_disks < 3:
         parser.error("RAID-5 requires a minimum of 3 disks.")
+    if disk_cap < 0:
+        parser.error("Disk capacity cannot be less than 0 bytes.")
     if args.fail >= num_disks:
         parser.error("Cannot fail disk " + repr(args.fail) + ": Invalid disk number")
 
-    controller = RAIDController(num_disks)
+    controller = RAIDController(num_disks, disk_cap)
 
     for i in range(len(data)):
         f = RAIDFile(i, data[i])
         files.append(f)
-        controller.write_file(f)
+        try:
+            controller.write_file(f)
+        except DiskFullException as e:
+            controller.print_data()
+            sys.exit(e.msg)
 
     controller.print_data()
 

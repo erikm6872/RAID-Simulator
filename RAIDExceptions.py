@@ -28,6 +28,18 @@ class DiskException(Exception):
         super(DiskException, self).__init__(msg)
 
 
+class DiskFullException(DiskException):
+    def __init__(self, disk_id):
+        self.disk_id = disk_id
+        super(DiskFullException, self).__init__("Error writing file: Target disk '" + repr(disk_id) + "' is full")
+
+
+class DiskReadException(DiskException):
+    def __init__(self, msg):
+        self.msg = msg
+        super(DiskReadException, self).__init__(msg)
+
+
 class DiskReconstructException(DiskException):
     def __init__(self, msg):
         self.msg = msg
