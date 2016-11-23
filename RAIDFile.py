@@ -11,6 +11,7 @@ class RAIDFile:
     data_B = []
     start_addr = None
     padding = 0
+    deleted = False
 
     def __init__(self, file_id, data):
         self.id = file_id
@@ -21,7 +22,7 @@ class RAIDFile:
         return len(self.data_B)
 
     def __repr__(self):
-        return repr(self.id) + ": '" + self.data_S + "'"
+        return repr(self.id) + ": '" + self.convert_bit_arr(self.data_B) + "'"
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -39,8 +40,13 @@ class RAIDFile:
         return bin_list
 
     @staticmethod
-    def from_bits(file_id, b):
+    def convert_bit_arr(b):
         ret_str = ""
         for x in b:
             ret_str += chr(int(x, 2))
+        return ret_str
+
+    @staticmethod
+    def from_bits(file_id, b):
+        ret_str = RAIDFile.convert_bit_arr(b)
         return RAIDFile(file_id, ret_str)

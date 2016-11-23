@@ -26,10 +26,14 @@ class Disk:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def write(self, data):
-        if (self.capacity > 0) and (len(self.data) + len(data) > self.capacity):
+    def write(self, data, index=None):
+        if (self.capacity > 0) and (len(self.data) + len(data) > self.capacity) and index is not None:
             raise DiskFullException(self.disk_id)
-        self.data.append(data)
+
+        if index is None:
+            self.data.append(data)
+        else:
+            self.data[index] = data
 
     def read(self, index):
         if index >= len(self.data):

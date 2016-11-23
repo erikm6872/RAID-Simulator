@@ -51,36 +51,46 @@ class RAIDController:
         return len(self.disks[0])
 
     # Writes a string of bits to the RAID disks
-    def __write_bits(self, data):
-        blocks = split_data(data, len(self.disks)-1)
+    def __write_bits(self, data, offset=None):
+        if offset is not None:
+            print(len(data))
+        blocks = list(split_data(data, len(self.disks)-1))
 
-        for x in blocks:
+        for i in range(len(blocks)):
             # Calculate parity bit for block x. We need to convert the bin strings to integers in order to use bit
             # manipulation to calculate the XOR
 
-            parity_bit = self.calculate_parity(x)
-            self.validate_parity(x + [format(parity_bit, bin_format)])
+            parity_bit = self.calculate_parity(blocks[i])
+            self.validate_parity(blocks[i] + [format(parity_bit, bin_format)])
 
             parity_disk = self.calculate_parity_disk(len(self))
 
             # Insert the parity bit into the block at the position of the current parity disk
-            x.insert(parity_disk, format(parity_bit, bin_format))
+            blocks[i].insert(parity_disk, format(parity_bit, bin_format))
 
             # Write block to disks
-            for i in range(len(x)):
-                self.disks[i].write(x[i])
+            for j in range(len(blocks[i])):
+                self.disks[j].write(blocks[i][j], i + offset if offset is not None else None)
 
     # Writes a RAIDFile object to disks
-    def write_file(self, file):
-        if len(self.files) == 0:
+    def write_file(self, file, offset=None):
+        if len(self.files) == 0 and offset is None:
             file.start_addr = 0
         else:
-            file.start_addr = len(self)
+            if offset is None:
+                file.start_addr = len(self)
 
-        self.files.append(file)
+        if offset is None:
+            self.files.append(file)
+        else:
+            for i in range(len(self.files)):
+                if self.files[i].id == file.id:
+                    self.files[i] = file
+
         blocks = list(split_data(file.data_B, len(self.disks) - 1))
-        file.padding = (len(self.disks) - 1) - len(blocks[-1])
-        self.__write_bits(file.data_B + [format(0, bin_format)] * file.padding)
+        file.padding = (len(self.disks) - 1) - len(blocks[-1]) if offset is None else file.padding
+        padding_bits = [format(0, bin_format)] * file.padding if offset is None else []
+        self.__write_bits(file.data_B + padding_bits, offset)
 
     # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):
@@ -156,6 +166,16 @@ class RAIDController:
             except IndexError:
                 pass
         return block
+
+    # Deletes a file off of the array by writing zeros to the disks where the file was stored
+    def delete_file(self, file):
+        empty_file = RAIDFile(file.id, RAIDFile.convert_bit_arr(file.data_B))
+        empty_file.start_addr = file.start_addr
+        empty_file.deleted = True
+        for i in range(len(empty_file.data_B)):
+            empty_file.data_B[i] = format(0, bin_format)
+
+        self.write_file(empty_file, empty_file.start_addr)
 
     def calculate_parity_disk(self, index):
         return self.num_disks - ((index % self.num_disks) + 1)
