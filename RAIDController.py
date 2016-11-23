@@ -4,7 +4,9 @@
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
 from Disk import Disk
-#from RAID_File import *
+from RAIDExceptions import *
+from RAIDFile import *
+
 
 class ParityCalculationException(Exception):
     def __init__(self, block=None, expected=None, actual=None):
@@ -18,8 +20,8 @@ class ParityCalculationException(Exception):
             msg = "Incorrect parity bit calculation\nBlock: "
             for x in block:
                 msg += x + " "
-            msg += "\nExpected: " + repr(expected) + " (" + format(expected, '#010b') + ")\n"
-            msg += "Actual:   " + repr(actual) + " (" + format(actual, '#010b') + ")\n"
+            msg += "\nExpected: " + repr(expected) + " (" + format(expected, bin_format) + ")\n"
+            msg += "Actual:   " + repr(actual) + " (" + format(actual, bin_format) + ")\n"
         super(ParityCalculationException, self).__init__(msg)
 
 
@@ -37,8 +39,7 @@ def split_data(data, size):
 class RAIDController:
 
     disks = []
-    #files = []
-    padding_bits = []
+    files = []
 
     def __init__(self, num_disks):
         self.num_disks = num_disks
@@ -49,11 +50,7 @@ class RAIDController:
         return len(self.disks[0])
 
     # Writes a string of bits to the RAID disks
-    def write_string(self, data):
-        if (len(data) % self.num_disks)-1 != 0:
-            data += [format(0, '#010b')] * ((len(data) % self.num_disks) - 1)
-        self.padding_bits.append((len(data) % self.num_disks) - 2)
-
+    def __write_bits(self, data):
         blocks = split_data(data, len(self.disks)-1)
 
         for x in blocks:
@@ -61,32 +58,62 @@ class RAIDController:
             # manipulation to calculate the XOR
 
             parity_bit = self.calculate_parity(x)
-            self.validate_parity(x + [format(parity_bit, '#010b')])
+            self.validate_parity(x + [format(parity_bit, bin_format)])
 
-            parity_disk = self.calculate_parity_disk(len(self), len(self.disks))
+            parity_disk = self.calculate_parity_disk(len(self))
 
             # Insert the parity bit into the block at the position of the current parity disk
-            x.insert(parity_disk, format(parity_bit, '#010b'))
+            x.insert(parity_disk, format(parity_bit, bin_format))
 
             # Write block to disks
             for i in range(len(x)):
                 self.disks[i].write(x[i])
 
     # Writes a RAIDFile object to disks
-    #def write_file(self, file):
-    #    if len(self.files) == 0:
-    #        file.start_addr = 0
+    def write_file(self, file):
+        if len(self.files) == 0:
+            file.start_addr = 0
+        else:
+            file.start_addr = len(self)
 
-    # Read all data on disks, ignoring parity bits. Does not account for missing disks.
-    def read_all(self):
+        self.files.append(file)
+        blocks = list(split_data(file.data_B, len(self.disks) - 1))
+        file.padding = (len(self.disks) - 1) - len(blocks[-1])
+        self.__write_bits(file.data_B + [format(0, bin_format)] * file.padding)
+
+    # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
+    def read_all_data(self):
         ret_str = ''
         for i in range(len(self)):
             for j in range(self.num_disks):
-                parity_disk = self.calculate_parity_disk(i, len(self.disks))
-                if j != parity_disk and i < len(self.disks[j]):
+                parity_disk = self.calculate_parity_disk(i)
+                if j != parity_disk:
                     ret_str += chr(int(self.disks[j].read(i), 2))   # Convert bin string to integer, then to character
-        ret_str = ret_str[:len(ret_str) - self.padding_bits[0]]
+            for k in range(len(self.files)):
+                if i == self.files[k].start_addr - 1:
+                    ret_str = ret_str[:len(ret_str) - self.files[k-1].padding]
+
+        ret_str = ret_str[:len(ret_str) - self.files[-1].padding]
         return ret_str
+
+    # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
+    def read_all_files(self):
+        ret_bits = []
+        ret_files = []
+        for i in range(len(self)):
+            for j in range(self.num_disks):
+                parity_disk = self.calculate_parity_disk(i)
+                if j != parity_disk:
+                    ret_bits.append(self.disks[j].read(i))
+            for k in range(len(self.files)):
+                if i == self.files[k].start_addr - 1:
+                    ret_bits = ret_bits[:len(ret_bits) - self.files[k - 1].padding]
+                    ret_files.append(RAIDFile.from_bits(k - 1, ret_bits))
+                    ret_bits = []
+
+        ret_bits = ret_bits[:len(ret_bits) - self.files[-1].padding]
+        ret_files.append(RAIDFile.from_bits(self.files[-1].id, ret_bits))
+        return ret_files
 
     # Simulate a disk failing by removing it from the list
     def disk_fails(self, disk_num):
@@ -103,9 +130,9 @@ class RAIDController:
             block = []
             for j in range(len(self.disks)):
                 block.append(self.disks[j].read(i))
-            self.validate_parity(block + [format(self.calculate_parity(block), '#010b')])
+            self.validate_parity(block + [format(self.calculate_parity(block), bin_format)])
 
-            new_disk.write(format(self.calculate_parity(block), '#010b'))
+            new_disk.write(format(self.calculate_parity(block), bin_format))
         self.disks.insert(disk_num, new_disk)
         self.validate_disks()
 
@@ -129,6 +156,9 @@ class RAIDController:
                 pass
         return block
 
+    def calculate_parity_disk(self, index):
+        return self.num_disks - ((index % self.num_disks) + 1)
+
     # Prints the data on each disk in a table. Parity bits are marked with '*'
     def print_data(self):
         for x in self.disks:
@@ -137,8 +167,8 @@ class RAIDController:
         for i in range(len(self.disks)):
             print("-----------", end="")
         print("-")
-        parity_disk = len(self.disks) - 1  # Starts at the last disk and moves backwards
         for i in range(len(self.disks[0])):
+            parity_disk = self.calculate_parity_disk(i)
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
                     print("| " + self.disks[j].read(i)[2:], end="")
@@ -146,8 +176,12 @@ class RAIDController:
                         print("*", end="")
                     else:
                         print(" ", end="")
-            parity_disk = parity_disk - 1 if parity_disk != 0 else len(self.disks) - 1
-            print("|")
+            print("|", end="")
+            for f in self.files:
+                if i == f.start_addr:
+                    print("<- File " + repr(f.id), end="")
+            print()
+        print()
 
     # Calculate parity bit for block. We need to convert the bin strings to integers in order to use bit
     # manipulation to calculate the XOR
@@ -168,12 +202,3 @@ class RAIDController:
             if calculated_parity != int(parity,2):
                 raise ParityCalculationException(block, calculated_parity, int(parity, 2))
             block.insert(i, parity)
-
-    @staticmethod
-    def calculate_parity_disk(index, num_disks):
-        return num_disks - ((index % num_disks) + 1)
-
-
-
-
-
