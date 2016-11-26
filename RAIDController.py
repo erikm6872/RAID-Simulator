@@ -173,7 +173,7 @@ class RAIDController:
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
                     print("| " + self.disks[j].read(i)[2:], end="")
-                    if j == parity_disk:
+                    if self.disks[j].disk_id == parity_disk:
                         print("*", end="")
                     else:
                         print(" ", end="")
