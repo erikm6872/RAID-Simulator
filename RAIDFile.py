@@ -4,7 +4,7 @@
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
 
-bin_format = '#010b'    # Binary format to store data. '#010b' = 10 bits including '0b' append
+bin_format = '#010b'    # Binary format to store data. '#010b' = 8 bits/1 byte not including '0b' append
 
 
 class RAIDFile:
