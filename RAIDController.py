@@ -6,6 +6,9 @@
 from Disk import Disk
 from RAIDExceptions import *
 from RAIDFile import *
+from colorama import init
+from colorama import Fore, Back, Style
+init()
 
 
 class ParityCalculationException(Exception):
@@ -172,10 +175,11 @@ class RAIDController:
             parity_disk = self.calculate_parity_disk(i)
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
-                    print("| " + self.disks[j].read(i)[2:], end="")
                     if self.disks[j].disk_id == parity_disk:
-                        print("*", end="")
+                        print("| " + Fore.RED + self.disks[j].read(i)[2:], end="")
+                        print("*" + Style.RESET_ALL, end="")
                     else:
+                        print("| " + self.disks[j].read(i)[2:], end="")
                         print(" ", end="")
             print("|", end="")
             for f in self.files:
