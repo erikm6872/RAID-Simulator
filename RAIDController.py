@@ -126,6 +126,7 @@ class RAIDController:
 
     # Reconstructs a failed disk.
     def reconstruct_disk(self, disk_num):
+        print("Reconstructing Disk")
         if (self.num_disks - len(self.disks)) > 1:
             raise DiskReconstructException("Cannot reconstruct disk: too many disks missing")
 
@@ -176,11 +177,11 @@ class RAIDController:
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
                     if self.disks[j].disk_id == parity_disk:
-                        print("| " + Fore.RED + self.disks[j].read(i)[2:], end="")
+                        print("| " + Back.RED + Fore.BLACK + self.disks[j].read(i)[2:], end="")
                         print("*" + Style.RESET_ALL, end="")
                     else:
-                        print("| " + self.disks[j].read(i)[2:], end="")
-                        print(" ", end="")
+                        print("| " + Back.YELLOW + Fore.BLACK + self.disks[j].read(i)[2:], end="")
+                        print(" " + Style.RESET_ALL, end="")
             print("|", end="")
             for f in self.files:
                 if i == f.start_addr:
