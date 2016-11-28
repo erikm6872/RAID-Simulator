@@ -96,6 +96,7 @@ def fail_disks(disks, controller, orig_disks):
     for x in disks:
         controller.disk_fails(x)
         controller.print_data()
+        print(controller.read_all_data())
         controller.reconstruct_disk(x)
         controller.print_data()
         try:

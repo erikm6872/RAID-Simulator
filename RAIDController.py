@@ -89,7 +89,7 @@ class RAIDController:
     def read_all_data(self):
         ret_str = ''
         for i in range(len(self)):
-            for j in range(self.num_disks):
+            for j in range(len(self.disks)):
                 parity_disk = self.calculate_parity_disk(i)
                 if j != parity_disk:
                     ret_str += chr(int(self.disks[j].read(i), 2))   # Convert bin string to integer, then to character
