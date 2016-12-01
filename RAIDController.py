@@ -6,6 +6,9 @@
 from Disk import Disk
 from RAIDExceptions import *
 from RAIDFile import *
+from colorama import init
+from colorama import Fore, Back, Style
+init()
 
 
 class ParityCalculationException(Exception):
@@ -86,7 +89,7 @@ class RAIDController:
     def read_all_data(self):
         ret_str = ''
         for i in range(len(self)):
-            for j in range(self.num_disks):
+            for j in range(len(self.disks)):
                 parity_disk = self.calculate_parity_disk(i)
                 if j != parity_disk:
                     ret_str += chr(int(self.disks[j].read(i), 2))   # Convert bin string to integer, then to character
@@ -123,6 +126,7 @@ class RAIDController:
 
     # Reconstructs a failed disk.
     def reconstruct_disk(self, disk_num):
+        print("Reconstructing Disk")
         if (self.num_disks - len(self.disks)) > 1:
             raise DiskReconstructException("Cannot reconstruct disk: too many disks missing")
 
@@ -172,11 +176,12 @@ class RAIDController:
             parity_disk = self.calculate_parity_disk(i)
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
-                    print("| " + self.disks[j].read(i)[2:], end="")
                     if self.disks[j].disk_id == parity_disk:
-                        print("*", end="")
+                        print("| " + Back.RED + Fore.BLACK + self.disks[j].read(i)[2:], end="")
+                        print("*" + Style.RESET_ALL, end="")
                     else:
-                        print(" ", end="")
+                        print("| " + Back.YELLOW + Fore.BLACK + self.disks[j].read(i)[2:], end="")
+                        print(" " + Style.RESET_ALL, end="")
             print("|", end="")
             for f in self.files:
                 if i == f.start_addr:
