@@ -11,29 +11,6 @@ from colorama import Fore, Back, Style
 init()
 
 
-class ParityCalculationException(Exception):
-    def __init__(self, block=None, expected=None, actual=None):
-        self.block = block
-        self.expected = expected
-        self.actual = actual
-
-        if block is None or expected is None or actual is None:
-            msg = "Incorrect parity bit calculation"
-        else:
-            msg = "Incorrect parity bit calculation\nBlock: "
-            for x in block:
-                msg += x + " "
-            msg += "\nExpected: " + repr(expected) + " (" + format(expected, bin_format) + ")\n"
-            msg += "Actual:   " + repr(actual) + " (" + format(actual, bin_format) + ")\n"
-        super(ParityCalculationException, self).__init__(msg)
-
-
-class DiskReconstructException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-        super(DiskReconstructException, self).__init__(msg)
-
-
 def split_data(data, size):
     for i in range(0, len(data), size):
         yield data[i:i + size]

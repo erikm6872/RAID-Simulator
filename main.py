@@ -6,6 +6,7 @@
 import sys
 from argparse import *
 from RAIDController import *
+from RAID0_Controller import *
 from RAIDFile import *
 from RAIDExceptions import *
 
@@ -19,6 +20,12 @@ def main():
                         default=5,
                         metavar='DISKS',
                         help='Number of disks in the RAID array. Default=5')
+
+    parser.add_argument('-l', '--level',
+                        type=int,
+                        default=5,
+                        choices=range(0,6),
+                        help='RAID level to simulate. Default=5')
 
     parser.add_argument('-c', '--capacity',
                         type=int,
@@ -69,7 +76,7 @@ def main():
     if args.fail >= num_disks:
         parser.error("Cannot fail disk " + repr(args.fail) + ": Invalid disk number")
 
-    controller = RAIDController(num_disks, disk_cap)
+    controller = RAID0_Controller(num_disks, disk_cap)
 
     for i in range(len(data)):
         f = RAIDFile(i, data[i])
