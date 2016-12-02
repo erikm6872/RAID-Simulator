@@ -167,21 +167,21 @@ class RAIDController:
     # Prints the data on each disk in a table. Parity bits are marked with '*'
     def print_data(self):
         for x in self.disks:
-            print("|    " + repr(x.disk_id) + "     ", end="")
+            print("|   " + repr(x.disk_id) + "    ", end="")
         print("|")
         for i in range(len(self.disks)):
-            print("-----------", end="")
+            print("---------", end="")
         print("-")
         for i in range(len(self.disks[0])):
             parity_disk = self.calculate_parity_disk(i)
             for j in range(len(self.disks)):
                 if i < len(self.disks[j]):
                     if self.disks[j].disk_id == parity_disk:
-                        print("| " + Back.RED + Fore.BLACK + self.disks[j].read(i)[2:], end="")
-                        print("*" + Style.RESET_ALL, end="")
+                        print("|" + Back.RED + Fore.BLACK + self.disks[j].read(i)[2:], end="")
+                        print(Style.RESET_ALL, end="")
                     else:
-                        print("| " + Back.YELLOW + Fore.BLACK + self.disks[j].read(i)[2:], end="")
-                        print(" " + Style.RESET_ALL, end="")
+                        print("|" + Back.YELLOW + Fore.BLACK + self.disks[j].read(i)[2:], end="")
+                        print(Style.RESET_ALL, end="")
             print("|", end="")
             for f in self.files:
                 if i == f.start_addr:
