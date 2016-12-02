@@ -52,6 +52,10 @@ def main():
                             'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit'
                             ' anim id est laborum.'],
                         help='Data strings to write to the disks array. Default is a series of Lorem Ipsum strings.')
+    
+    parser.add_argument('-p', '--pause',
+                        action='store_true',
+                        help='Pause script between major actions. Used for demo purposes.')
 
     args = parser.parse_args()
     num_disks = args.numdisks
@@ -75,15 +79,19 @@ def main():
         except DiskFullException as e:
             controller.print_data()
             sys.exit(e.msg)
-
+    
     controller.print_data()
+    print(controller.read_all_data())
+    
+    if args.pause:
+        input("Press enter to continue...")
 
     orig_disks = list(controller.disks)
 
     if args.all:
-        fail_disks(range(num_disks), controller, orig_disks)
+        fail_disks(range(num_disks), controller, orig_disks, args.pause)
     else:
-        fail_disks([args.fail], controller, orig_disks)
+        fail_disks([args.fail], controller, orig_disks, args.pause)
 
     print(controller.read_all_data())
     read_files = controller.read_all_files()
@@ -92,11 +100,13 @@ def main():
             "Original and read strings are different.\nOriginal: " + repr(files) + "\nRead:     " + repr(read_files))
 
 
-def fail_disks(disks, controller, orig_disks):
+def fail_disks(disks, controller, orig_disks, pause=False):
     for x in disks:
         controller.disk_fails(x)
         controller.print_data()
         print(controller.read_all_data())
+        if pause:
+            input("Press enter to continue...")
         controller.reconstruct_disk(x)
         controller.print_data()
         try:
