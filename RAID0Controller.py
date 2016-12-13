@@ -2,14 +2,14 @@
 
 # Erik McLaughlin
 # 12/1/2016
-from RAIDController import *
+from RAID5Controller import *
+import warnings
 
-
-class RAID0_Controller(RAIDController):
+class RAID0Controller(RAIDController):
     def __init__(self, num_disks, disk_cap=0):
-        super(RAID0_Controller, self).__init__(num_disks, disk_cap)
+        super(RAID0Controller, self).__init__(num_disks, disk_cap)
 
-    def __write_bits(self, data):
+    def write_bits(self, data):
         blocks = split_data(data, len(self.disks))
 
         for x in blocks:
@@ -27,7 +27,7 @@ class RAID0_Controller(RAIDController):
         self.files.append(file)
         blocks = list(split_data(file.data_B, len(self.disks)))
         file.padding = (len(self.disks)) - len(blocks[-1])
-        self.__write_bits(file.data_B + [format(0, bin_format)] * file.padding)
+        self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
         # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):
@@ -48,7 +48,10 @@ class RAID0_Controller(RAIDController):
         ret_files = []
         for i in range(len(self)):
             for j in range(self.num_disks):
-                ret_bits.append(self.disks[j].read(i))
+                try:
+                    ret_bits.append(self.disks[j].read(i))
+                except IndexError:
+                    pass
             for k in range(len(self.files)):
                 if i == self.files[k].start_addr - 1:
                     ret_bits = ret_bits[:len(ret_bits) - self.files[k - 1].padding]
@@ -61,8 +64,32 @@ class RAID0_Controller(RAIDController):
 
     # Simulate a disk failing by removing it from the list
     def disk_fails(self, disk_num):
-        raise RuntimeWarning("RAID-0 does not support disk reconstruction")
+        del self.disks[disk_num]
+        warnings.warn("Raid-0 does not support disk reconstruction.")
+        # raise RuntimeWarning("RAID-0 does not support disk reconstruction")
 
     # Reconstructs a failed disk.
     def reconstruct_disk(self, disk_num):
-        raise RuntimeError("Raid-0 does not support disk reconstruction")
+        # raise RuntimeError("Raid-0 does not support disk reconstruction")
+        warnings.warn("Raid-0 does not support disk reconstruction.")
+
+    def print_data(self):
+        for x in self.disks:
+            print("|   " + repr(x.disk_id) + "    ", end="")
+        print("|")
+        for i in range(len(self.disks)):
+            print("---------", end="")
+        print("-")
+        for i in range(len(self.disks[0])):
+            for j in range(len(self.disks)):
+                if i < len(self.disks[j]):
+                    print("|" + self.disks[j].read(i)[2:], end="")
+            print("|", end="")
+            for f in self.files:
+                if i == f.start_addr:
+                    print("<- File " + repr(f.id), end="")
+            print()
+        print()
+
+    def validate_disks(self, orig_disks):
+        pass
