@@ -5,6 +5,7 @@
 from RAID5Controller import *
 import warnings
 
+
 class RAID0Controller(RAIDController):
     def __init__(self, num_disks, disk_cap=0):
         super(RAID0Controller, self).__init__(num_disks, disk_cap)
@@ -16,18 +17,6 @@ class RAID0Controller(RAIDController):
             # Write block to disks
             for i in range(len(x)):
                 self.disks[i].write(x[i])
-
-    # Writes a RAIDFile object to disks
-    def write_file(self, file):
-        if len(self.files) == 0:
-            file.start_addr = 0
-        else:
-            file.start_addr = len(self)
-
-        self.files.append(file)
-        blocks = list(split_data(file.data_B, len(self.disks)))
-        file.padding = (len(self.disks)) - len(blocks[-1])
-        self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
         # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):

@@ -38,18 +38,6 @@ class RAID5Controller(RAIDController):
             for i in range(len(x)):
                 self.disks[i].write(x[i])
 
-    # Writes a RAIDFile object to disks
-    def write_file(self, file):
-        if len(self.files) == 0:
-            file.start_addr = 0
-        else:
-            file.start_addr = len(self)
-
-        self.files.append(file)
-        blocks = list(split_data(file.data_B, len(self.disks) - 1))
-        file.padding = (len(self.disks) - 1) - len(blocks[-1])
-        self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
-
     # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):
         ret_str = ''

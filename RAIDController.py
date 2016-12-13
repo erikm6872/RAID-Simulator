@@ -4,7 +4,7 @@
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
 from Disk import Disk
-
+from RAIDFile import *
 from abc import abstractmethod, ABCMeta
 
 
@@ -36,12 +36,19 @@ class RAIDController(metaclass=ABCMeta):
                 pass
         return block
 
-    @abstractmethod
-    def write_bits(self, data):
-        pass
+    def write_file(self, file):
+        if len(self.files) == 0:
+            file.start_addr = 0
+        else:
+            file.start_addr = len(self)
+
+        self.files.append(file)
+        blocks = list(split_data(file.data_B, len(self.disks) - 1))
+        file.padding = (len(self.disks) - 1) - len(blocks[-1])
+        self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
     @abstractmethod
-    def write_file(self, file):
+    def write_bits(self, data):
         pass
 
     @abstractmethod
