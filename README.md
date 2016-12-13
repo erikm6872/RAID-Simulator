@@ -9,8 +9,8 @@
 
 ## Arguments
 ```
-usage: main.py [-h] [-n DISKS] [-c CAP] [-f DISK] [-a] [-d [DATA [DATA ...]]]
-               [-p]
+usage: main.py [-h] [-n DISKS] [-l {0,1,2,3,4,5,6}] [-c CAP] [-f DISK] [-a]
+               [-d [DATA [DATA ...]]] [-p]
 
 RAID-5 Simulator
 
@@ -18,6 +18,8 @@ optional arguments:
   -h, --help            show this help message and exit
   -n DISKS, --numdisks DISKS
                         Number of disks in the RAID array. Default=5
+  -l {0,1,2,3,4,5,6}, --level {0,1,2,3,4,5,6}
+                        RAID level to simulate. Default=5
   -c CAP, --capacity CAP
                         Storage capacity of each disk in bytes. Default=0
                         (unlimited)

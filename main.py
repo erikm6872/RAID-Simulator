@@ -24,7 +24,7 @@ def main():
     parser.add_argument('-l', '--level',
                         type=int,
                         default=5,
-                        choices=range(0, 6),
+                        choices=range(0, 7),
                         help='RAID level to simulate. Default=5')
 
     parser.add_argument('-c', '--capacity',
