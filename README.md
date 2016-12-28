@@ -2,7 +2,8 @@
 ### Erik McLaughlin, Tyler Wright & Dave Robins
 
 ## Prerequisites
-* Python 3.5.2 
+* Python 3.5
+* [Colorama 0.3.7](https://pypi.python.org/pypi/colorama)
 
 ## Run
 * `$ python main.py`
