@@ -96,6 +96,3 @@ class RAID0Controller(RAIDController):
         blocks = list(split_data(file.data_B, len(self.disks)))
         file.padding = len(self.disks) - len(blocks[-1])
         self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
-
-    def validate_disks(self, orig_disks):
-        pass

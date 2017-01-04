@@ -88,5 +88,4 @@ class RAID2Controller(RAIDController):
             print()
         print()
 
-    def validate_disks(self, orig_disks):
-        pass
+

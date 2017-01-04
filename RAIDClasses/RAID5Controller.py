@@ -96,16 +96,6 @@ class RAID5Controller(RAIDController):
         self.disks.insert(disk_num, new_disk)
         self.validate_disks()
 
-    # Validates the correctness of the parity for each stripe. If an original disk array is passed in, the Disk objects
-    # in it are compared to the ones currently in the disk array to see if they contain the same data.
-    def validate_disks(self, orig_disks=None):
-        for i in range(len(self)):
-            self.validate_parity(self.get_stripe(i))
-        if orig_disks is not None:
-            for i in range(len(orig_disks)):
-                if orig_disks[i] != self.disks[i]:
-                    raise DiskReconstructException("Disk reconstruction failed: Disk " + repr(i) + " corrupted")
-
     def calculate_parity_disk(self, index):
         return self.num_disks - ((index % self.num_disks) + 1)
 

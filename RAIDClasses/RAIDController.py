@@ -6,6 +6,7 @@
 from Disk import Disk
 from RAIDFile import *
 from abc import abstractmethod, ABCMeta
+from RAIDExceptions import *
 
 
 def split_data(data, size):
@@ -48,6 +49,17 @@ class RAIDController(metaclass=ABCMeta):
         file.padding = (len(self.disks) - 1) - len(blocks[-1])
         self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
+
+    # Validates the correctness of the parity for each stripe. If an original disk array is passed in, the Disk objects
+    # in it are compared to the ones currently in the disk array to see if they contain the same data.
+    def validate_disks(self, orig_disks=None):
+        for i in range(len(self)):
+            self.validate_parity(self.get_stripe(i))
+        if orig_disks is not None:
+            for i in range(len(orig_disks)):
+                if orig_disks[i] != self.disks[i]:
+                    raise DiskReconstructException("Disk reconstruction failed: Disk " + repr(i) + " corrupted")
+
     @abstractmethod
     def write_bits(self, data):
         pass
@@ -62,10 +74,6 @@ class RAIDController(metaclass=ABCMeta):
 
     @abstractmethod
     def disk_fails(self, disk_num):
-        pass
-
-    @abstractmethod
-    def validate_disks(self, orig_disks):
         pass
 
     @abstractmethod
