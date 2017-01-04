@@ -8,8 +8,7 @@ from colorama import Fore, Back, Style
 from colorama import init
 
 from RAIDExceptions import *
-from RAIDFile import *
-from RAIDController import *
+from RAID_Classes.RAIDController import *
 
 init()
 
@@ -18,11 +17,8 @@ RAID-5: Data is striped across n-1 disks, with parity calculations for each bloc
 '''
 
 
-class RAID4Controller(RAIDController):
+class RAID5Controller(RAIDController):
     __metaclass__ = RAIDController
-
-    def __init__(self):
-        raise NotImplementedError("RAID-4 Not Yet Implemented")
 
     # Writes a string of bits to the RAID disks
     def write_bits(self, data):

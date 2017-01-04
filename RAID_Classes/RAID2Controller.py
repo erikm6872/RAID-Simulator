@@ -2,8 +2,9 @@
 
 # Erik McLaughlin
 # 12/1/2016
-from RAID5Controller import *
 import warnings
+
+from RAID_Classes.RAID5Controller import *
 
 '''
 RAID-2:

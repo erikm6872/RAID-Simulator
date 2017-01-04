@@ -1,5 +1,9 @@
-# RAID-5 Simulator
-### Erik McLaughlin, Tyler Wright & Dave Robins
+# RAID Simulator
+#### [Erik McLaughlin](https://erikcmclaughlin.com), Tyler Wright & Dave Robins
+
+## Description
+RAID Simulator is an open source tool written in Python used to demonstrate the differences in RAID levels. 
+This is an ongoing project, currently only RAID levels 0, 1, 4 and 5 are implemented.
 
 ## Prerequisites
 * Python 3.5

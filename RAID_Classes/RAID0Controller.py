@@ -2,8 +2,9 @@
 
 # Erik McLaughlin
 # 12/1/2016
-from RAID5Controller import *
 import warnings
+
+from RAID_Classes.RAID5Controller import *
 
 '''
 RAID-0: Data is striped across all disks without parity calculations.
@@ -83,6 +84,18 @@ class RAID0Controller(RAIDController):
                     print("<- File " + repr(f.id), end="")
             print()
         print()
+
+    # Needs to be overridden because the padding is different when parity is not used.
+    def write_file(self, file):
+        if len(self.files) == 0:
+            file.start_addr = 0
+        else:
+            file.start_addr = len(self)
+
+        self.files.append(file)
+        blocks = list(split_data(file.data_B, len(self.disks) - 1))
+        file.padding = (len(self.disks) - 1) - len(blocks[-1])
+        self.write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
     def validate_disks(self, orig_disks):
         pass

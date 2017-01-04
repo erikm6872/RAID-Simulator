@@ -36,6 +36,7 @@ class RAIDController(metaclass=ABCMeta):
                 pass
         return block
 
+    @abstractmethod
     def write_file(self, file):
         if len(self.files) == 0:
             file.start_addr = 0
