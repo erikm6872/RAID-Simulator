@@ -6,13 +6,13 @@
 import sys
 from argparse import *
 
-from RAID_Classes.RAID0Controller import *
-from RAID_Classes.RAID1Controller import *
-from RAID_Classes.RAID2Controller import *
-from RAID_Classes.RAID3Controller import *
-from RAID_Classes.RAID4Controller import *
-from RAID_Classes.RAID5Controller import *
-from RAID_Classes.RAID6Controller import *
+from RAIDClasses.RAID0Controller import *
+from RAIDClasses.RAID1Controller import *
+from RAIDClasses.RAID2Controller import *
+from RAIDClasses.RAID3Controller import *
+from RAIDClasses.RAID4Controller import *
+from RAIDClasses.RAID5Controller import *
+from RAIDClasses.RAID6Controller import *
 
 
 from RAIDExceptions import *

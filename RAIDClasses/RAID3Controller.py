@@ -4,19 +4,19 @@
 # 12/1/2016
 import warnings
 
-from RAID_Classes.RAID5Controller import *
+from RAIDClasses.RAID5Controller import *
 
 '''
-RAID-2:
+RAID-3:
 
 '''
 
 
-class RAID2Controller(RAIDController):
+class RAID3Controller(RAIDController):
     __metaclass__ = RAIDController
 
     def __init__(self, num_disks, disk_cap):
-        raise NotImplementedError("RAID-2 Not Yet Implemented")
+        raise NotImplementedError("RAID-3 Not Yet Implemented")
 
     def write_bits(self, data):
         blocks = split_data(data, len(self.disks))

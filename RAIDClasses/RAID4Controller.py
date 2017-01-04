@@ -8,20 +8,18 @@ from colorama import Fore, Back, Style
 from colorama import init
 
 from RAIDExceptions import *
-from RAID_Classes.RAIDController import *
+from RAIDClasses.RAIDController import *
+from RAIDClasses.RAID5Controller import *
 
 init()
 
 '''
-RAID-5: Data is striped across n-1 disks, with parity calculations for each block. Parity bits are striped across disks.
+RAID-4: Data is striped across n-1 disks, with parity calculations for each block. Parity bits are on dedicated disk.
 '''
 
 
-class RAID6Controller(RAIDController):
+class RAID4Controller(RAIDController):
     __metaclass__ = RAIDController
-
-    def __init__(self, num_disks, disk_cap):
-        raise NotImplementedError("RAID-6 Not Yet Implemented")
 
     # Writes a string of bits to the RAID disks
     def write_bits(self, data):
@@ -109,8 +107,10 @@ class RAID6Controller(RAIDController):
                 if orig_disks[i] != self.disks[i]:
                     raise DiskReconstructException("Disk reconstruction failed: Disk " + repr(i) + " corrupted")
 
+    # Calculate the disk to store parity bits on for the current block.
+    # In RAID-4 all parity is stored on a single disk, so we store it on disk n-1
     def calculate_parity_disk(self, index):
-        return self.num_disks - ((index % self.num_disks) + 1)
+        return self.num_disks - 1
 
     def print_data(self):
         for x in self.disks:
@@ -151,7 +151,7 @@ class RAID6Controller(RAIDController):
     def validate_parity(block):
         for i in range(len(block)):
             parity = block.pop(i)
-            calculated_parity = RAID5Controller.calculate_parity(block)
-            if calculated_parity != int(parity,2):
+            calculated_parity = RAID4Controller.calculate_parity(block)
+            if calculated_parity != int(parity, 2):
                 raise ParityCalculationException(block, calculated_parity, int(parity, 2))
             block.insert(i, parity)

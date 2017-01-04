@@ -8,7 +8,7 @@ from colorama import Fore, Back, Style
 from colorama import init
 
 from RAIDExceptions import *
-from RAID_Classes.RAIDController import *
+from RAIDClasses.RAIDController import *
 
 init()
 
