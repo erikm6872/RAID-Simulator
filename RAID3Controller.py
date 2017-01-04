@@ -6,13 +6,16 @@ from RAID5Controller import *
 import warnings
 
 '''
-RAID-0: Data is striped across all disks without parity calculations.
+RAID-3:
 
 '''
 
 
-class RAID0Controller(RAIDController):
+class RAID3Controller(RAIDController):
     __metaclass__ = RAIDController
+
+    def __init__(self, num_disks, disk_cap):
+        raise NotImplementedError("RAID-3 Not Yet Implemented")
 
     def write_bits(self, data):
         blocks = split_data(data, len(self.disks))

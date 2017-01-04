@@ -5,8 +5,15 @@
 # 11/14/2016
 import sys
 from argparse import *
-from RAID5Controller import *
+
 from RAID0Controller import *
+from RAID1Controller import *
+from RAID2Controller import *
+from RAID3Controller import *
+from RAID4Controller import *
+from RAID5Controller import *
+from RAID6Controller import *
+
 from RAIDFile import *
 from RAIDExceptions import *
 
@@ -80,17 +87,17 @@ def main():
     if args.level == 0:
         controller = RAID0Controller(num_disks, disk_cap)
     elif args.level == 1:
-        raise NotImplementedError("RAID-1 not yet implemented")
+        controller = RAID1Controller(num_disks, disk_cap)
     elif args.level == 2:
-        raise NotImplementedError("RAID-2 not yet implemented")
+        controller = RAID2Controller(num_disks, disk_cap)
     elif args.level == 3:
-        raise NotImplementedError("RAID-3 not yet implemented")
+        controller = RAID3Controller(num_disks, disk_cap)
     elif args.level == 4:
-        raise NotImplementedError("RAID-4 not yet implemented")
+        controller = RAID4Controller(num_disks, disk_cap)
     elif args.level == 5:
         controller = RAID5Controller(num_disks, disk_cap)
     elif args.level == 6:
-        raise NotImplementedError("RAID-6 not yet implemented")
+        controller = RAID6Controller(num_disks, disk_cap)
 
     # Write files
     for i in range(len(data)):

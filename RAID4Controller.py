@@ -18,8 +18,11 @@ RAID-5: Data is striped across n-1 disks, with parity calculations for each bloc
 '''
 
 
-class RAID5Controller(RAIDController):
+class RAID4Controller(RAIDController):
     __metaclass__ = RAIDController
+
+    def __init__(self):
+        raise NotImplementedError("RAID-4 Not Yet Implemented")
 
     # Writes a string of bits to the RAID disks
     def write_bits(self, data):
