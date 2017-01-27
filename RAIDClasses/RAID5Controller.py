@@ -3,58 +3,25 @@
 #   RAIDController.py
 # Erik McLaughlin, Tyler Wright & Dave Robins
 # 11/14/2016
-from Disk import Disk
-from RAIDExceptions import *
-from RAIDFile import *
-from colorama import init
+
 from colorama import Fore, Back, Style
+from colorama import init
+
+from RAIDExceptions import *
+from RAIDClasses.RAIDController import *
+
 init()
 
-
-class ParityCalculationException(Exception):
-    def __init__(self, block=None, expected=None, actual=None):
-        self.block = block
-        self.expected = expected
-        self.actual = actual
-
-        if block is None or expected is None or actual is None:
-            msg = "Incorrect parity bit calculation"
-        else:
-            msg = "Incorrect parity bit calculation\nBlock: "
-            for x in block:
-                msg += x + " "
-            msg += "\nExpected: " + repr(expected) + " (" + format(expected, bin_format) + ")\n"
-            msg += "Actual:   " + repr(actual) + " (" + format(actual, bin_format) + ")\n"
-        super(ParityCalculationException, self).__init__(msg)
+'''
+RAID-5: Data is striped across n-1 disks, with parity calculations for each block. Parity bits are striped across disks.
+'''
 
 
-class DiskReconstructException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-        super(DiskReconstructException, self).__init__(msg)
-
-
-def split_data(data, size):
-    for i in range(0, len(data), size):
-        yield data[i:i + size]
-
-
-class RAIDController:
-
-    disks = []
-    files = []
-
-    def __init__(self, num_disks, disk_cap=0):
-        self.num_disks = num_disks
-        self.disk_cap = disk_cap
-        for i in range(num_disks):
-            self.disks.append(Disk(i, disk_cap))
-
-    def __len__(self):
-        return len(self.disks[0])
+class RAID5Controller(RAIDController):
+    __metaclass__ = RAIDController
 
     # Writes a string of bits to the RAID disks
-    def __write_bits(self, data):
+    def write_bits(self, data):
         blocks = split_data(data, len(self.disks)-1)
 
         for x in blocks:
@@ -72,18 +39,6 @@ class RAIDController:
             # Write block to disks
             for i in range(len(x)):
                 self.disks[i].write(x[i])
-
-    # Writes a RAIDFile object to disks
-    def write_file(self, file):
-        if len(self.files) == 0:
-            file.start_addr = 0
-        else:
-            file.start_addr = len(self)
-
-        self.files.append(file)
-        blocks = list(split_data(file.data_B, len(self.disks) - 1))
-        file.padding = (len(self.disks) - 1) - len(blocks[-1])
-        self.__write_bits(file.data_B + [format(0, bin_format)] * file.padding)
 
     # Read all data on disks, ignoring parity bits and padding. Does not account for missing disks.
     def read_all_data(self):
@@ -141,30 +96,9 @@ class RAIDController:
         self.disks.insert(disk_num, new_disk)
         self.validate_disks()
 
-    # Validates the correctness of the parity for each stripe. If an original disk array is passed in, the Disk objects
-    # in it are compared to the ones currently in the disk array to see if they contain the same data.
-    def validate_disks(self, orig_disks=None):
-        for i in range(len(self)):
-            self.validate_parity(self.get_stripe(i))
-        if orig_disks is not None:
-            for i in range(len(orig_disks)):
-                if orig_disks[i] != self.disks[i]:
-                    raise DiskReconstructException("Disk reconstruction failed: Disk " + repr(i) + " corrupted")
-
-    # Returns a stripe of data from the disk array.
-    def get_stripe(self, index):
-        block = []
-        for i in range(len(self.disks)):
-            try:
-                block.append(self.disks[i].read(index))
-            except IndexError:
-                pass
-        return block
-
     def calculate_parity_disk(self, index):
         return self.num_disks - ((index % self.num_disks) + 1)
 
-    # Prints the data on each disk in a table. Parity bits are marked with '*'
     def print_data(self):
         for x in self.disks:
             print("|   " + repr(x.disk_id) + "    ", end="")
@@ -204,7 +138,7 @@ class RAIDController:
     def validate_parity(block):
         for i in range(len(block)):
             parity = block.pop(i)
-            calculated_parity = RAIDController.calculate_parity(block)
+            calculated_parity = RAID5Controller.calculate_parity(block)
             if calculated_parity != int(parity,2):
                 raise ParityCalculationException(block, calculated_parity, int(parity, 2))
             block.insert(i, parity)
